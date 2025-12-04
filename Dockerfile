@@ -1,5 +1,5 @@
-# Sử dụng Python 3.9 trên nền Linux nhẹ (Slim)
-FROM python:3.9-slim
+# Sử dụng Python 3.9 trên nền Debian Bullseye (Bản ổn định cũ) để tránh lỗi thư viện bị thiếu
+FROM python:3.9-slim-bullseye
 
 # 1. Cài đặt các gói hệ thống cần thiết
 # Lưu ý: Chúng ta KHÔNG cài tesseract-ocr-vie bằng apt-get nữa vì hay bị lỗi tìm không thấy gói
