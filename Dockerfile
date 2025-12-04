@@ -1,27 +1,36 @@
 # Sử dụng Python 3.9 trên nền Linux nhẹ (Slim)
 FROM python:3.9-slim
 
-# 1. Cài đặt các gói hệ thống cần thiết (Tesseract + Tiếng Việt + Thư viện xử lý ảnh)
-# Đây là bước quan trọng nhất để Server hiểu được Tesseract
+# 1. Cài đặt các gói hệ thống cần thiết
+# Lưu ý: Chúng ta KHÔNG cài tesseract-ocr-vie bằng apt-get nữa vì hay bị lỗi tìm không thấy gói
+# Thay vào đó ta cài 'curl' để tải file ngôn ngữ thủ công
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
-    tesseract-ocr-vie \
     libgl1-mesa-glx \
     libglib2.0-0 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Thiết lập thư mục làm việc
+# 2. Tải thủ công dữ liệu Tiếng Việt (vie.traineddata) từ GitHub
+# Cách này ổn định hơn, đảm bảo 100% có dữ liệu tiếng Việt
+RUN mkdir -p /usr/share/tesseract-ocr/tessdata
+RUN curl -L -o /usr/share/tesseract-ocr/tessdata/vie.traineddata [https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata](https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata)
+
+# 3. Thiết lập biến môi trường để Tesseract biết chỗ tìm file dữ liệu
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/tessdata/
+
+# 4. Thiết lập thư mục làm việc
 WORKDIR /app
 
-# 3. Copy file requirements và cài thư viện Python
+# 5. Copy file requirements và cài thư viện Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. Copy toàn bộ code vào
+# 6. Copy toàn bộ code vào
 COPY . .
 
-# 5. Tạo thư mục uploads để chứa ảnh tạm thời
+# 7. Tạo thư mục uploads để chứa ảnh tạm thời
 RUN mkdir -p uploads
 
-# 6. Lệnh chạy App bằng Gunicorn (Server Production)
+# 8. Lệnh chạy App bằng Gunicorn (Server Production)
 CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
