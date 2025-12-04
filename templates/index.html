@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR CCCD Online</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-10">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">Đọc CCCD Online (Tesseract)</h1>
+            
+            <form id="uploadForm" class="space-y-4">
+                <input type="file" id="fileInput" accept="image/*" class="w-full p-2 border rounded">
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">
+                    Xử lý ngay
+                </button>
+            </form>
+
+            <div id="loading" class="hidden text-center mt-4 text-gray-500">Đang xử lý...</div>
+
+            <div id="result" class="hidden mt-6 space-y-3 border-t pt-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="font-bold text-gray-500">Số CCCD:</p>
+                        <p id="resID" class="text-xl text-blue-800 font-mono font-bold">---</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-500">Ngày sinh:</p>
+                        <p id="resDob" class="text-lg">---</p>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-500">Họ và tên:</p>
+                    <p id="resName" class="text-lg font-bold">---</p>
+                </div>
+                
+                <div class="mt-4">
+                    <p class="font-bold text-gray-500 mb-2">Ảnh Tesseract nhìn thấy:</p>
+                    <img id="processedImg" src="" class="w-full border rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('fileInput').files[0];
+            if(!file) return alert('Vui lòng chọn ảnh');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('result').classList.add('hidden');
+
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if(data.success) {
+                    document.getElementById('resID').innerText = data.data.id || "Không tìm thấy";
+                    document.getElementById('resName').innerText = data.data.name || "Không tìm thấy";
+                    document.getElementById('resDob').innerText = data.data.dob || "Không tìm thấy";
+                    document.getElementById('processedImg').src = 'data:image/jpeg;base64,' + data.processed_image;
+                    document.getElementById('result').classList.remove('hidden');
+                } else {
+                    alert('Lỗi: ' + data.error);
+                }
+            } catch(err) {
+                alert('Lỗi kết nối server');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
