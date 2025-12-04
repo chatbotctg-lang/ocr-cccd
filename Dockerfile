@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Tải thủ công dữ liệu Tiếng Việt (vie.traineddata) từ GitHub
-# Cách này ổn định hơn, đảm bảo 100% có dữ liệu tiếng Việt
+# Link raw chuẩn, không có định dạng markdown
 RUN mkdir -p /usr/share/tesseract-ocr/tessdata
 RUN curl -L -o /usr/share/tesseract-ocr/tessdata/vie.traineddata [https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata](https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata)
 
