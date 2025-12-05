@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Tải thủ công dữ liệu Tiếng Việt (vie.traineddata) từ GitHub
-# Link raw chuẩn, không có định dạng markdown
+# Link raw chuẩn, không có định dạng markdown gây lỗi
 RUN mkdir -p /usr/share/tesseract-ocr/tessdata
-RUN curl -L -o /usr/share/tesseract-ocr/tessdata/vie.traineddata [https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata](https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata)
+RUN curl -L -o /usr/share/tesseract-ocr/tessdata/vie.traineddata https://github.com/tesseract-ocr/tessdata_best/raw/main/vie.traineddata
 
 # 3. Thiết lập biến môi trường để Tesseract biết chỗ tìm file dữ liệu
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/tessdata/
